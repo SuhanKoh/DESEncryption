@@ -9,11 +9,15 @@ import java.util.ArrayList;
 public class OFB {
     private byte[] IV;
     private DESLibrary des;
-    static String plainText = "qwerqweree";
+    static String plainText = "QWERQWER";
 
     public static void main(String[] args) throws Exception {
         OFB ofb = new OFB();
-        ofb.performOFB();
+        //ofb.performOFB();
+        char[] a = new char[]{'f'};
+        char[] b = new char[]{'\0'};
+
+        System.out.println(ofb.xor(a, b));
 
     }
 
@@ -23,14 +27,28 @@ public class OFB {
         String secretKey = "QWERTYUI";
         des = new DESLibrary(secretKey, "DES");
         byte[] plantTextBytes = plainText.getBytes();
-
+        byte[] xor = new byte[8];
         byte[] encryptedIV = des.encrypt(IV); // encrypt K with IV
+        char[] binaryEncryptedIV = toBinary(encryptedIV).toCharArray(); //for XOR1
+        byte[] msg = new byte[8];
+        for (int i = 0; i < plantTextBytes.length; i++) {
+            msg[i%8] = plantTextBytes[i];
+            if (((i + 1) % 8) == 0 && i > 0) {
+//                String msgStr = new String(msg);
+//                char[] msgBinary = toBinary(binaryEncryptedIV).toCharArray(); //for XOR2
+//                xor = xor(binaryEncryptedIV, msgBinary);
+
+            }
+        }
+
+        System.out.println(new String(xor) + " test ");
+
         String binaries = toBinary(encryptedIV);
+
+
         byte[] array = new byte[]{0xa};
         byte[] shift = bitsShift(array, 2);
         System.out.println(String.format("%x", shift[0]));
-
-
 
 
     }
@@ -62,7 +80,7 @@ public class OFB {
 
     public byte[] bitsShift(byte[] input, int position) {
         BigInteger bigInt = new BigInteger(input);
-        System.out.println(bigInt);
+//        System.out.println(bigInt);
         BigInteger shiftInt = bigInt.shiftRight(position);
         return shiftInt.toByteArray();
     }
@@ -74,11 +92,11 @@ public class OFB {
      * @param IV
      * @return
      */
-    public byte[] xor(byte[] input, byte[] IV) {
+    public char[] xor(char[] input, char[] IV) {
         //System.out.println(input.length + "  " + IV.length);
-        byte[] result = new byte[input.length];
+        char[] result = new char[input.length];
         for (int i = 0; i < input.length; i++) {
-            result[i] = (byte) ((int) input[i] ^ (int) IV[i]);
+            result[i] = (char) ( input[i] ^  IV[i]);
             //System.out.println("Input: " + (int) input[i] + "  IV: " + (int) IV[i] + "  and the result is: " + (int) result[i]);
         }
         return result;

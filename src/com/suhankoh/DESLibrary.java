@@ -10,8 +10,8 @@ import java.security.spec.InvalidKeySpecException;
 public class DESLibrary {
 
     private SecretKeySpec secretKey;
-    Cipher cipher;
-    Cipher decipher;
+    private Cipher cipher;
+    private Cipher decipher;
 
     public DESLibrary(String keys, String algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, UnsupportedEncodingException {
         byte[] test = keys.getBytes();

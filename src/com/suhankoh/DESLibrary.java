@@ -12,7 +12,7 @@ public class DESLibrary {
     private DESKeySpec desKeySpec;
     private SecretKey secretKey;
     private Cipher cipher;
-
+    private Cipher decipher;
     private SecretKey mSecretKey;
 
     public DESLibrary(String keys, String algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
@@ -20,17 +20,19 @@ public class DESLibrary {
 
         secretKey = SecretKeyFactory.getInstance(algorithm).generateSecret(desKeySpec);
         cipher = Cipher.getInstance(algorithm); // DES/ECB/PKCS5Padding for SunJCE
+        decipher = Cipher.getInstance(algorithm);
+        
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        decipher.init(Cipher.DECRYPT_MODE, secretKey);
 
     }
 
     public byte[] encrypt(byte[] bytes) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         return cipher.doFinal(bytes);
     }
 
     public byte[] decrypt(byte[] bytes) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        return cipher.doFinal(bytes);
+        return decipher.doFinal(bytes);
     }
 
 }

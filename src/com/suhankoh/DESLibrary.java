@@ -12,15 +12,13 @@ public class DESLibrary {
     private SecretKeySpec secretKey;
     Cipher cipher;
     Cipher decipher;
+
     public DESLibrary(String keys, String algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, UnsupportedEncodingException {
-        byte[] test = {1,2,3,4,5,6,7,8};
-        byte[] keyBytes = new byte[8];
-        secretKey = new SecretKeySpec(test, "DES");
+        byte[] test = keys.getBytes();
+        secretKey = new SecretKeySpec(test, algorithm);
 
-//        secretKey = new SecretKeySpec(test, algorithm);
-
-        cipher = Cipher.getInstance("DES");
-        decipher = Cipher.getInstance("DES");
+        cipher = Cipher.getInstance(algorithm);
+        decipher = Cipher.getInstance(algorithm);
 
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         decipher.init(Cipher.DECRYPT_MODE, secretKey);
@@ -32,10 +30,6 @@ public class DESLibrary {
     }
 
     public byte[] decrypt(byte[] bytes) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        System.out.println(bytes.length);
-
-        byte[] test = decipher.doFinal(bytes);
-        return test;
+        return decipher.doFinal(bytes);
     }
-
 }

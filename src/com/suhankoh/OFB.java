@@ -17,11 +17,14 @@ public class OFB {
         ofb.performOFB();
     }
 
+//1111001011111101000110000101100010100101110000000110000001011001and
+//110101110110100110101010110111001010011011101010and
+
+
 
     public void performOFB() throws Exception {
         IV = new byte[8];
-        new SecureRandom().nextBytes(IV);
-        System.out.println("ID311231:" + new String(IV));
+//        new SecureRandom().nextBytes(IV);
 
         String secretKey = "QWERTYUI";
         des = new DESLibrary(secretKey, "DES");
@@ -56,12 +59,9 @@ public class OFB {
                 String temp_binaryEncryptedIV = charArrayToString(binaryEncryptedIV);
                 byte[] temp = temp_binaryEncryptedIV.getBytes();
                 temp_binaryEncryptedIV = byteToBinary(temp, temp.length);
-                System.out.println("ID:" + binaryIV);
 
                 binaryIV = binaryIV + discardBinary(temp_binaryEncryptedIV, 0, binaryMsgStr.length());
-                System.out.println("ID:" + new String(IV));
                 IV = binaryToByte(binaryIV);
-                System.out.println("ID:" + new String(IV));
                 encryptedIV = des.encrypt(IV); // encrypt K with IV
                 binaryIV = byteToBinary(IV, IV.length);
                 binaryEncryptedIV = byteToBinary(encryptedIV, encryptedIV.length).toCharArray(); //for XOR1
@@ -88,7 +88,6 @@ public class OFB {
 
     public String byteToBinary(byte[] bytes, int size) {
         StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
-        System.out.println(size);
         for (int i = 0; i < Byte.SIZE * size; i++)
             sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
         return sb.toString();
@@ -96,9 +95,7 @@ public class OFB {
 
     public byte[] binaryToByte(String binaryString) {
         ArrayList<Integer> byteArrayList = new ArrayList<Integer>();
-//        System.out.println("BINARY STRING" + binaryString);
         for (String str : binaryString.split("(?<=\\G.{8})")) { //Regex for Continue matching only if \\G.{8} matches on the left, And \\G.{8} matches the first 8 everytime.
-//            System.out.println(str);
             byteArrayList.add(Integer.parseInt(str, 2));
         }
         byte[] bytes = new byte[byteArrayList.size()];
@@ -110,7 +107,6 @@ public class OFB {
 
     public byte[] bitsShift(byte[] input, int position) {
         BigInteger bigInt = new BigInteger(input);
-//        System.out.println(bigInt);
         BigInteger shiftInt = bigInt.shiftRight(position);
         return shiftInt.toByteArray();
     }
@@ -123,12 +119,10 @@ public class OFB {
      * @return
      */
     public char[] xor(char[] input, char[] IV) {
-        System.out.println(input.length + "  " + IV.length);
         int minLength = Math.min(input.length, IV.length);
         char[] result = new char[minLength];
         for (int i = 0; i < result.length; i++) {
             result[i] = (char) (input[i] ^ IV[i]);
-            //System.out.println("Input: " + (int) input[i] + "  IV: " + (int) IV[i] + "  and the result is: " + (int) result[i]);
         }
         return result;
     }

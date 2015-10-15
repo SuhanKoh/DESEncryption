@@ -33,8 +33,6 @@ public class CFB {
 
         String binaryIV = byteToBinary(IV, IV.length);
 
-//        1111001011111101000110000101100010100101110000000110000001011001and
-//        1111001011111101000110000101100010100101110000000110000001011001and
         char[] binaryEncryptedIV = byteToBinary(encryptedIV, encryptedIV.length).toCharArray(); //for XOR1
 
         byte[] msg = new byte[8];

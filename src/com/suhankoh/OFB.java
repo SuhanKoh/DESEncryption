@@ -20,7 +20,7 @@ public class OFB {
 
     public void performOFB() throws Exception {
         IV = new byte[8];
-        new SecureRandom().nextBytes(IV);
+//        new SecureRandom().nextBytes(IV);
         System.out.println("ID311231:" + new String(IV));
 
         String secretKey = "QWERTYUI";

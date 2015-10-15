@@ -8,35 +8,35 @@ import java.util.ArrayList;
  */
 public class CBC {
 
-    static String plainText = "qwertyuiasdfghjkzxcvbnm, q";
-
+//    static String plainText = "qwertyuiasdfghjkzxcvbnm, q";
+    String plainText = "";
 
     public static final String charset = "UTF8";
-    static byte[] IV;
+    byte[] IV;
     DESLibrary des;
     ArrayList<byte[]> cipherBlocks;
     String[] cipherTextBlocks;
 
     public static void main(String[] args) throws Exception {
-        IV = new byte[8];
-        new SecureRandom().nextBytes(IV);
         String secretKey = "QWERTYUI";
-        CBC cbc = new CBC(secretKey);
+        CBC cbc = new CBC("qwertyuiasdfghjkzxcvbnm, q", secretKey, "qwerqwer");
         cbc.performEncryption();
-        cbc.performDecryption();
+        cbc.performDecryption(); //de-comment this to see the result.
     }
 
-    public CBC(String secretKey) throws Exception {
+    public CBC(String plainText,String secretKey, String IV) throws Exception {
         des = new DESLibrary(secretKey, "DES");
         cipherBlocks = new ArrayList<>();
+        this.plainText = plainText;
+        this.IV = IV.getBytes();
     }
 
     public void performEncryption() throws Exception {
         byte[] tempIV = IV;
         byte[] plainTextByte = plainText.getBytes();
         byte[] msg = new byte[8];
-        int blockCounter = (int) plainTextByte.length / 8;
-        int paddingCounter = (plainTextByte.length % 8);
+        int blockCounter = (int) plainTextByte.length / 8; //how many blocks are there for the plaintext
+        int paddingCounter = (plainTextByte.length % 8); //how many padding it require
 
         if (paddingCounter > 0) {
             blockCounter++;
@@ -44,14 +44,14 @@ public class CBC {
         cipherTextBlocks = new String[blockCounter + 1];
         int blocks = 0;
         for (int i = 0; i < blockCounter * 8; i++) {
-            if (i < plainTextByte.length) {
+            if (i < plainTextByte.length) { //avoid msg get replaced when it requires padding
                 msg[i % 8] = (plainTextByte[i]);
-            } else {
+            } else { //padding
                 for (int j = (i) % 8; j < 8; j++) {
                     msg[j % 8] = (byte) '\0';
                 }
             }
-            if ((((i + 1) % 8 == 0))) {
+            if ((((i + 1) % 8 == 0))) { //when it get 8 bytes and can be encrypted into a block
                 byte[] xor = xor(msg, tempIV);
                 cipherBlocks.add(des.encrypt(xor));
                 tempIV = cipherBlocks.get(blocks);
@@ -69,6 +69,10 @@ public class CBC {
         }
     }
 
+    /**
+     * Method that will take the byte and decrypt.
+     * @throws Exception
+     */
     public void performDecryption() throws Exception {
         System.out.println("\n\n");
         byte[] tempIV = IV;
@@ -90,11 +94,9 @@ public class CBC {
      * @return
      */
     public byte[] xor(byte[] input, byte[] IV) {
-        //System.out.println(input.length + "  " + IV.length);
         byte[] result = new byte[input.length];
         for (int i = 0; i < input.length; i++) {
             result[i] = (byte) ((int) input[i] ^ (int) IV[i]);
-            //System.out.println("Input: " + (int) input[i] + "  IV: " + (int) IV[i] + "  and the result is: " + (int) result[i]);
         }
         return result;
     }

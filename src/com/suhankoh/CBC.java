@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class CBC {
 
-    static String plainText = "qwertyuiasdfghjkzxcvbnm,";
+    static String plainText = "qwertyuiasdfghjkzxcvbnm, q";
 
 
     public static final String charset = "UTF8";
@@ -37,19 +37,11 @@ public class CBC {
         byte[] msg = new byte[8];
         int blockCounter = (int) plainTextByte.length / 8;
         int paddingCounter = (plainTextByte.length % 8);
-        int min = 0;
-        if (plainTextByte.length - paddingCounter <= 0) {
-            min = plainTextByte.length;
-        } else {
-            min = plainTextByte.length - paddingCounter;
-        }
+
         if (paddingCounter > 0) {
             blockCounter++;
-//            blockCounter++;
 
         }
-        System.out.println(min+"\t\t"+blockCounter+"\t\t\t"+plainText.getBytes().length);
-//        System.out.println("Block is : " + blockCounter + " padding: " + paddingCounter + " textlength: " + plainTextByte.length);
         cipherTextBlocks = new String[blockCounter+1];
         int blocks = 0;
         for (int i = 0; i < blockCounter*8; i++) {
@@ -57,9 +49,7 @@ public class CBC {
                 msg[i % 8] = (plainTextByte[i]);
             }
             else{
-                System.out.println("i  is " + i);
                 for (int j = (i)% 8; j < 8; j++) {
-                    System.out.println("j is " + j);
                     msg[j % 8] = (byte) '\0';
                 }
             }
@@ -67,7 +57,6 @@ public class CBC {
                 byte[] xor = xor(msg, tempIV);
                 cipherBlocks.add(des.encrypt(xor));
                 tempIV = cipherBlocks.get(blocks);
-                System.out.println(blocks + new String(tempIV));
                 cipherTextBlocks[blocks] = new String(tempIV);
 
                 blocks++;

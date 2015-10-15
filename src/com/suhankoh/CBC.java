@@ -1,5 +1,6 @@
 package com.suhankoh;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 /**
@@ -7,9 +8,8 @@ import java.util.ArrayList;
  */
 public class CBC {
 
-//            static String plainText = "Lorem ipsum dolor sit amet, consectetur ";
-    static String plainText = "qwerqweree";
-//    static String plainText = "qwerqw";
+    static String plainText = "qwertyuiasdfghjkzxcvbnm,";
+
 
     public static final String charset = "UTF8";
     static byte[] IV;
@@ -18,7 +18,8 @@ public class CBC {
     String[] cipherTextBlocks;
 
     public static void main(String[] args) throws Exception {
-        IV = new byte[]{1, 2, 3, 4, 5, 6, 7, 8};
+        IV = new byte[8];
+        new SecureRandom().nextBytes(IV);
         String secretKey = "QWERTYUI";
         CBC cbc = new CBC(secretKey);
         cbc.performEncryption();
@@ -44,30 +45,40 @@ public class CBC {
         }
         if (paddingCounter > 0) {
             blockCounter++;
+//            blockCounter++;
+
         }
+        System.out.println(min+"\t\t"+blockCounter+"\t\t\t"+plainText.getBytes().length);
 //        System.out.println("Block is : " + blockCounter + " padding: " + paddingCounter + " textlength: " + plainTextByte.length);
-        cipherTextBlocks = new String[blockCounter];
+        cipherTextBlocks = new String[blockCounter+1];
         int blocks = 0;
-        for (int i = 0; i < min; i++) {
-            msg[i % 8] = (plainTextByte[i]);
-            if ((i + 1) == min) {
+        for (int i = 0; i < blockCounter*8; i++) {
+            if(i < plainTextByte.length) {
+                msg[i % 8] = (plainTextByte[i]);
+            }
+            else{
                 System.out.println("i  is " + i);
-                for (int j = (i % 8) + 1; j < 8; j++) {
+                for (int j = (i)% 8; j < 8; j++) {
                     System.out.println("j is " + j);
                     msg[j % 8] = (byte) '\0';
                 }
             }
-            if ((((i + 1) % 8 == 0) || (i >= min-1))&& i > 0) {
+            if ((((i + 1) % 8 == 0) )) {
                 byte[] xor = xor(msg, tempIV);
                 cipherBlocks.add(des.encrypt(xor));
                 tempIV = cipherBlocks.get(blocks);
-                cipherTextBlocks[blocks] = new String(cipherBlocks.get(blocks));
+                System.out.println(blocks + new String(tempIV));
+                cipherTextBlocks[blocks] = new String(tempIV);
+
                 blocks++;
+                if (blocks-1 == blockCounter) {
+                    break;
+                }
             }
         }
 
         for (int i = 0; i < cipherTextBlocks.length; i++) {
-            System.out.println(cipherTextBlocks[i]);
+            System.out.println(i + "\t " + cipherTextBlocks[i] + "\t" + cipherTextBlocks.length);
         }
     }
 
@@ -80,7 +91,7 @@ public class CBC {
             byte[] plaintext = des.decrypt(cipherBlocks.get(i));
             byte[] xor = xor(plaintext, tempIV);
             tempIV = cipherBlocks.get(i);
-            System.out.println(new String(xor));
+            System.out.println(i + "\t" + new String(xor));
         }
     }
 

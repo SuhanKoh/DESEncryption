@@ -40,27 +40,25 @@ public class CBC {
 
         if (paddingCounter > 0) {
             blockCounter++;
-
         }
-        cipherTextBlocks = new String[blockCounter+1];
+        cipherTextBlocks = new String[blockCounter + 1];
         int blocks = 0;
-        for (int i = 0; i < blockCounter*8; i++) {
-            if(i < plainTextByte.length) {
+        for (int i = 0; i < blockCounter * 8; i++) {
+            if (i < plainTextByte.length) {
                 msg[i % 8] = (plainTextByte[i]);
-            }
-            else{
-                for (int j = (i)% 8; j < 8; j++) {
+            } else {
+                for (int j = (i) % 8; j < 8; j++) {
                     msg[j % 8] = (byte) '\0';
                 }
             }
-            if ((((i + 1) % 8 == 0) )) {
+            if ((((i + 1) % 8 == 0))) {
                 byte[] xor = xor(msg, tempIV);
                 cipherBlocks.add(des.encrypt(xor));
                 tempIV = cipherBlocks.get(blocks);
                 cipherTextBlocks[blocks] = new String(tempIV);
 
                 blocks++;
-                if (blocks-1 == blockCounter) {
+                if (blocks - 1 == blockCounter) {
                     break;
                 }
             }

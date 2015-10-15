@@ -8,7 +8,6 @@ import java.util.ArrayList;
  */
 public class CBC {
 
-//    static String plainText = "qwertyuiasdfghjkzxcvbnm, q";
     String plainText = "";
 
     public static final String charset = "UTF8";
@@ -19,19 +18,21 @@ public class CBC {
 
     public static void main(String[] args) throws Exception {
         String secretKey = "QWERTYUI";
-        CBC cbc = new CBC("qwertyuiasdfghjkzxcvbnm, q", secretKey, "qwerqwer");
-        cbc.performEncryption();
-        cbc.performDecryption(); //de-comment this to see the result.
+        CBC cbc = new CBC();
+        cbc.CBC("qwertyuiasdfghjkzxcvbnm, q", secretKey, "QWERQWER");
+//        cbc.performEncryption();
+//        cbc.performDecryption(); //de-comment this to see the result.
     }
 
-    public CBC(String plainText,String secretKey, String IV) throws Exception {
+    public String CBC(String plainText,String secretKey, String IV) throws Exception{ //Use this method
         des = new DESLibrary(secretKey, "DES");
         cipherBlocks = new ArrayList<>();
         this.plainText = plainText;
         this.IV = IV.getBytes();
+        return performEncryption();
     }
 
-    public void performEncryption() throws Exception {
+    public String performEncryption() throws Exception {
         byte[] tempIV = IV;
         byte[] plainTextByte = plainText.getBytes();
         byte[] msg = new byte[8];
@@ -63,10 +64,13 @@ public class CBC {
                 }
             }
         }
-
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cipherTextBlocks.length; i++) {
+            sb.append(cipherTextBlocks[i]);
             System.out.println(i + "\t " + cipherTextBlocks[i] + "\t" + cipherTextBlocks.length);
         }
+
+        return sb.toString();
     }
 
     /**
@@ -77,8 +81,6 @@ public class CBC {
         System.out.println("\n\n");
         byte[] tempIV = IV;
         for (int i = 0; i < cipherBlocks.size(); i++) {
-//            System.out.println("Length is : " + cipherBlocks.get(i).length + " And tempIV: " + tempIV.length);
-            //byte[] cipherbyte = cipherTextBlocks[i].getBytes();
             byte[] plaintext = des.decrypt(cipherBlocks.get(i));
             byte[] xor = xor(plaintext, tempIV);
             tempIV = cipherBlocks.get(i);

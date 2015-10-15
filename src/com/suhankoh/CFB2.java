@@ -6,19 +6,19 @@ import java.util.ArrayList;
 /**
  * Created by Suhan on 10/15/15.
  */
-public class OFB2 {
+public class CFB2 {
     private DESLibrary des;
     static String plainText = "QWERQWER";
     byte[] IV;
 
     public static void main(String[] args) throws Exception {
-        OFB2 ofb2 = new OFB2();
+        CFB2 cfb2 = new CFB2();
         String secretKey = "QWERTYUI";
 
-        System.out.println(ofb2.OFB2(plainText, secretKey, "TESTQWER", 8));
+        System.out.println(cfb2.CFB2(plainText, secretKey, "TESTQWER", 8));
     }
 
-    public String OFB2(String m, String key, String mIV, int k) throws Exception {
+    public String CFB2(String m, String key, String mIV, int k) throws Exception {
         this.IV = new byte[8];
 //        new SecureRandom().nextBytes(IV);
         des = new DESLibrary(key, "DES");
@@ -37,18 +37,20 @@ public class OFB2 {
         String append = "";
         String cipher = "";
 
-        for(int loop = 0; loop < msgBinaries.length(); loop+=k){ // Each blocks
+        for (int loop = 0; loop < msgBinaries.length(); loop += k) { // Each blocks
             for (int i = 0; i < k; i++) { //k bits
-                if (((int) msgChar[i] + (int) binaryEncryptedIV[i]) == (49+48)) {
+                if (((int) msgChar[i] + (int) binaryEncryptedIV[i]) == (49 + 48)) {
                     resultXor[i] = 1;
                 } else {
                     resultXor[i] = 0;
                 }
-                append += (binaryEncryptedIV[i]);
+                append += (int)(resultXor[i]);
+
             }
+//            System.out.println("test:\t\t" + append);
+
             //Each cipher blocks
             cipher += charArrayToString(resultXor);
-
             //"shifting bits" and appending new k-bits
             IVString = discardBinary(IVString, k, IVString.length()) + append;
 
@@ -56,12 +58,37 @@ public class OFB2 {
             IVByte = IVString.getBytes();
             encryptedIV = des.encrypt(IVByte); // encrypt K with IV
             System.out.println(IVString);
-
             binaryEncryptedIV = byteToBinary(encryptedIV, encryptedIV.length).toCharArray();
             append = "";
         }
 
-        System.out.println(cipher +"\n"+IVString + "\n" + IVStr + "\n\n" + new String(binaryToByte(cipher)));
+        /* OFB2
+        0100010101010011010101000101000101010111010001010101001000010111
+0101001101010100010100010101011101000101010100100001011111110111
+0101010001010001010101110100010101010010000101111111011111010010
+0101000101010111010001010101001000010111111101111101001010000000
+0101011101000101010100100001011111110111110100101000000001010100
+0100010101010010000101111111011111010010100000000101010011010011
+0101001000010111111101111101001010000000010101001101001111110111
+0001011111110111110100101000000001010100110100111111011111001011
+0100011010100110100000111101000100000101100000101010011010011010
+0001011111110111110100101000000001010100110100111111011111001011
+
+         */
+        /* CFB2
+        0100010101010011010101000101000101010111010001010101001001000110
+0101001101010100010100010101011101000101010100100100011010100110
+0101010001010001010101110100010101010010010001101010011010000011
+0101000101010111010001010101001001000110101001101000001111010001
+0101011101000101010100100100011010100110100000111101000100000101
+0100010101010010010001101010011010000011110100010000010110000010
+0101001001000110101001101000001111010001000001011000001010100110
+0100011010100110100000111101000100000101100000101010011010011010
+0100011010100110100000111101000100000101100000101010011010011010
+0100011010100110100000111101000100000101100000101010011010011010
+         */
+
+        System.out.println(cipher + "\n" + IVString + "\n" + IVStr + "\n\n" + new String(binaryToByte(cipher)));
         return cipher;
     }
 
@@ -116,36 +143,6 @@ public class OFB2 {
             result[i] = (char) (input[i] ^ IV[i]);
         }
         return result;
+
     }
-
 }
-/*
-            msg[i % 8] = plainTextBytes[i];
-            if ((i + 1) % 8 == 0) {
-                msgCount = 8;
-            } else {
-                msgCount++;
-            }
-            if (((((i + 1) % 8) == 0) || i == plainTextBytes.length - 1) && i > 0) { // 8 byte blocks
-                String binaryMsgStr = byteToBinary(msg, msgCount);
-                msgCount = 0;
-                char[] msgBinary = binaryMsgStr.toCharArray(); //binaries of the msg for XOR2
-                xor = xor(binaryEncryptedIV, msgBinary); //perform XOR
-                String binary = charArrayToString(xor); //change the XOR chars into String
-
-                binaryIV = discardBinary(binaryIV, binaryMsgStr.length(), binaryIV.length()); //getting the IV
-
-                String temp_binaryEncryptedIV = charArrayToString(binaryEncryptedIV);
-                byte[] temp = temp_binaryEncryptedIV.getBytes();
-                temp_binaryEncryptedIV = byteToBinary(temp, temp.length);
-
-                binaryIV = binaryIV + discardBinary(temp_binaryEncryptedIV, 0, binaryMsgStr.length());
-                IV = binaryToByte(binaryIV);
-                encryptedIV = des.encrypt(IV); // encrypt K with IV
-                binaryIV = byteToBinary(IV, IV.length);
-                binaryEncryptedIV = byteToBinary(encryptedIV, encryptedIV.length).toCharArray(); //for XOR1
-
-                System.out.println("the i is:" + i + " binary: " + binary + "and byte:" + binary.length() / 8 + " string: " + binaryMsgStr);
-            }
-
- */

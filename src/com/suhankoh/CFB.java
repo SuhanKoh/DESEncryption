@@ -5,26 +5,26 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 
 /**
- * Created by Suhan on 10/14/15.
+ * Created by Suhan on 10/15/15.
  */
-public class OFB {
+public class CFB {
     private byte[] IV;
     private DESLibrary des;
     static String plainText = "QWERQWEWERQWER";
 
     public static void main(String[] args) throws Exception {
-        OFB ofb = new OFB();
-        ofb.performOFB();
+        CFB cfb = new CFB();
+        cfb.performCFB();
     }
 
 
-    public void performOFB() throws Exception {
+    public void performCFB() throws Exception {
         IV = new byte[8];
         new SecureRandom().nextBytes(IV);
-        System.out.println("ID311231:" + new String(IV));
 
         String secretKey = "QWERTYUI";
         des = new DESLibrary(secretKey, "DES");
+
 
         byte[] plainTextBytes = plainText.getBytes();
         char[] xor = new char[0];
@@ -33,6 +33,8 @@ public class OFB {
 
         String binaryIV = byteToBinary(IV, IV.length);
 
+//        1111001011111101000110000101100010100101110000000110000001011001and
+//        1111001011111101000110000101100010100101110000000110000001011001and
         char[] binaryEncryptedIV = byteToBinary(encryptedIV, encryptedIV.length).toCharArray(); //for XOR1
 
         byte[] msg = new byte[8];
@@ -53,15 +55,14 @@ public class OFB {
 
                 binaryIV = discardBinary(binaryIV, binaryMsgStr.length(), binaryIV.length()); //getting the IV
 
-                String temp_binaryEncryptedIV = charArrayToString(binaryEncryptedIV);
+                String temp_binaryEncryptedIV = charArrayToString(xor); //HERE is the different with OFB, it takes the result of XOR instead of the kbits from encrypted IV.
+
                 byte[] temp = temp_binaryEncryptedIV.getBytes();
+
                 temp_binaryEncryptedIV = byteToBinary(temp, temp.length);
-                System.out.println("ID:" + binaryIV);
 
                 binaryIV = binaryIV + discardBinary(temp_binaryEncryptedIV, 0, binaryMsgStr.length());
-                System.out.println("ID:" + new String(IV));
                 IV = binaryToByte(binaryIV);
-                System.out.println("ID:" + new String(IV));
                 encryptedIV = des.encrypt(IV); // encrypt K with IV
                 binaryIV = byteToBinary(IV, IV.length);
                 binaryEncryptedIV = byteToBinary(encryptedIV, encryptedIV.length).toCharArray(); //for XOR1
@@ -88,7 +89,7 @@ public class OFB {
 
     public String byteToBinary(byte[] bytes, int size) {
         StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
-        System.out.println(size);
+//        System.out.println(size);
         for (int i = 0; i < Byte.SIZE * size; i++)
             sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
         return sb.toString();
@@ -123,7 +124,7 @@ public class OFB {
      * @return
      */
     public char[] xor(char[] input, char[] IV) {
-        System.out.println(input.length + "  " + IV.length);
+//        System.out.println(input.length + "  " + IV.length);
         int minLength = Math.min(input.length, IV.length);
         char[] result = new char[minLength];
         for (int i = 0; i < result.length; i++) {
@@ -132,4 +133,5 @@ public class OFB {
         }
         return result;
     }
+
 }
